@@ -1,0 +1,271 @@
+\documentclass[12pt,eqnleft,executivepaper]{article}
+\pagestyle{headings}
+\pagenumbering{Roman}
+\usepackage{hhline}
+\usepackage{longtable}
+\usepackage{pgfplots}
+\usepackage{comment}
+\pgfplotsset{width=10cm,height=5cm,domain=0:1,xmin=0,xmax=1,compat=1.9}
+\definecolor{prm}{rgb}{192,0,0}
+%paints
+\usepackage{color,graphicx}
+%Coding
+\usepackage[OT1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{halloweenmath} 
+%Scripts
+\usepackage{amsmath,amsfonts,amssymb}
+%Pictures
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+%addition
+\usepackage{multicol,lettrine,derivative}
+\DeclareOdvVariant{\odv}{d}[style-inf=\mathrm,style-frac=\sfrac,scale-fun=Bigg]
+\DeclareOdvVariant{\odv}{d}[style-inf=\symup,sep-inf-fun=0.8,sep-inf-ord= 0.3]%\odv[n]*{y}/{x}_{точка x_1}^{x_2}
+\DeclareOdvVariant{\mdv}{D}[style-inf=\mathrm,sep-eval-sb=0.3,sep-eval-sp=0.4]
+\DeclareOdvVariant{\mdv}{D}[style-inf=\symnormal,misc-add-delims={frac}]% Material derivative \mdv *[⟨order⟩]{⟨function⟩}/{⟨variable⟩}_{⟨point1⟩}^{⟨point2 ⟩}
+\DeclareOdvVariant{\fdv}{\delta}%functional derivative \fdv ...
+% The functional derivative is used in the calculus of variation and uses a lowercase delta.
+\DeclareOdvVariant{\adv}{\Delta}[style-inf=\mathrm]
+\DeclareOdvVariant{\adv}{\Delta}% the average rate of change \adv 
+\DeclareOdvVariant{\jdv}{\partial}[misc-add-delims={fun}]%\jdv    *[⟨order⟩]{⟨function⟩}/{⟨variable⟩}_{⟨point1⟩}^{⟨point2 ⟩}
+\DeclarePdvVariant{\pdv}{\partial}[style-inf=\mathnormal,sep-inf-ord=1, sep-ord-fun=-2]
+\LTcapwidth=6pt %на заголовок longtable
+\usepackage{tikz}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{%digits in circle
+\node[shape=circle,draw,inner sep=2pt](char){#1};}}
+\newcommand*{\transpose}{\mathrm{T}}
+\newcommand*{\vvv}[1]{\ensuremath{\mathbf{#1}}}
+\binoppenalty =10000
+\relpenalty=10000
+\multlinegap=.3pt
+\begin{document}
+\begin{comment}
+\begin{titlepage} 
+	
+	\begin{center} 
+		\large 
+		
+		МОСКОВСКИЙ ГОСУДАРСТВЕННЫЙ УНИВЕРСИТЕТ \\ ИМ. М. В. ЛОМОНОСОВА 
+		\vspace{0.25cm} 
+		
+		Механико-математический факультет 
+		
+		
+		
+		Мочалов Максим Сергеевич
+		\vfill 
+		
+		\textsc{Отчет 8 семестра. Задача 3.21 из В.Ф. Дьяченко}\\[5mm] 
+		
+		\bigskip 
+		
+		4 курс, группа 424 
+	\end{center} 
+	\vfill 
+	
+	
+	\begin{center} 
+		Москва, 2019 г. 
+	\end{center} 
+\end{titlepage}
+\end{comment}
+\tableofcontents
+\newpage
+\section{Постановка задачи}
+В области $Q_T = \{(t, x) \ | \ 0 \leq t \leq 1, 0 \leq x \leq 1\}$ рассматривается задача:
+\begin{equation*}
+   \left\{
+        \begin{aligned}
+&\frac{\partial^2 u}{\partial t^2}-\frac{\partial^2 u}{\partial x^2}+2\omega u =0\\
+&\omega = 1-16x^2(1-x)^2\\
+&\text{Начальные условия}\\
+x=0\,,&\frac{\partial u}{\partial t}-\frac{\partial u}{\partial x}= \sin(t)\\
+x=1\,,&\frac{\partial u}{\partial t}+\frac{\partial u}{\partial x}= 0\\
+t=0\,:& u=0, \frac{\partial u}{\partial t}=0\\
+\end{aligned}\right.
+\end{equation*}
+
+\section{Схемы}
+\begin{center}
+\color{green}Явная схема для решения задачи: \\
+\end{center}
+\begin{equation}
+    \begin{split}
+       \hat{u}_m^{n+1}= \frac{\tau^2}{h^2}({u}_{m+1}^n - 2{u}_{m}^n + {u}_{m-1}^n)+(2-2\omega \tau^2) u_m^n - u_m^{n-1}\\ \label{Initial 1}
+    \end{split}
+\end{equation}
+\begin{center}
+\color{red}{Неявная схема для решения задачи:}\\[10pt]
+\end{center}
+\begin{equation}
+    \begin{split}
+    \hat{u}_m^{n+1}= \frac{\tau^2}{h^2}(\hat{u}_{m+1}^{n+1}- 2\hat{u}_{m}^{n+1} + \hat{u}_{m-1}^{n+1})
+-2\omega \tau^2 u_m^n + 2 u_m^n - u_m^{n-1}\\
+    \end{split}
+\end{equation}
+Представим $u_t(x,0) = \frac{u(x,t)-u(x,0)}{\tau} = \pdv{u(x,0)}{t} + \tau/2 *\pdv[2]{u(x,0)}{t}$\\[2pt]
+Oбратимся к исходному уранению:      $\pdv[2]{u(x,0)}{t} = \pdv[2]{u(x,0)}{x} + \omega u_m^0$\\[3pt]
+Поэтому $ u_t(x,0)  - 0.5 \tau *(\omega u_m^0+\odv[2]{u_0}{x}) =\pdv{u(x,0)}{t} + O(\tau^2) \\
+\rightarrow \text{Начального условие второго порядка остается} \\
+\pdv{u(x,0)}{t} = 0 + 0.5 \tau *(\omega u_m^0+\odv[2]{u_0}{x})+O(\tau^2)$\\
+$y_t(x,0) = 0$\text{    так как }$ u_m^0=0,u_0 = 0$(первое условие)$\rightarrow$\\
+Начальные и граничные условия примут вид:
+\begin{equation}
+\begin{aligned}
+&\frac{u_0^{n+1}-u_0^n}{\tau}-\frac{u_{1}^n-u_{0}^n}{h}=\sin(n\tau)&\qquad \\
+&\frac{u_{M}^{n+1}-u_{M}^n}{\tau} + \frac{u_{M}^n-u_{M-1}^n}{h}=0&\qquad  \\ 
+&u(mh,0)=0\qquad &u(mh,\tau)=0  \\ \label{Boundary 2}
+&\text{(из первого} \text{ выразим явно } u_0^{n+1} & \text{ из послед  } u_M^{n+1})\\%\mathleftghost
+\end{aligned}
+\end{equation}\newpage
+$u_1^{n+1}=u_0^n(\frac{h^2}{\tau^2}-\frac{h}{\tau}-2\frac{\tau}{h}+2\tau^2\omega)+u_0^{n-1}+u_1^n(\frac{h}{\tau}+2\frac{\tau}{h})+\frac{h^2}{\tau}\sin{n\tau}+2\tau\sin{n\tau}\quad\footnote[0]{Написал для удобства}\\[6pt]
+u_M^{n+1}=u_{M-1}^{n}(\frac{h^2}{\tau^2}+\frac{h}{\tau}+2[1+\frac{\tau}{h}]+2[\omega h^2 -\frac{h^2}{\tau^2}])-u_M^n(\frac{h}{\tau}+2\frac{\tau}{h})+u_{M-2}^{n+1}(\frac{h^2}{\tau^2}-1)$\\[6pt]
+ $u_0^{n+1}=\tau\sin{n\tau}+\frac{\tau}{h}(u_1^n-u_0)+u_0^n $\\[6pt]
+Явно выражая $\hat{u}_m^{n+1}$ из $\eqref{Initial 1} $ и используя условия $ \quad \eqref{Boundary 2}$ \\
+находим решение на "новом временном слое".\\ 
+Неявная схема $(3)$ и условия $(4), (5)$ дают систему линейных алгебраических уравнений относительно неизвестных
+ \vvv{v}$\stackrel{\mathrm{*}}{=}(\hat{u}_0, \hat{u}_1, \ldots,\hat{u}_N)\textsuperscript{T}$. 
+\\[3pt] \begin{flushleft}
+Система в матричном виде $A^{\scriptsize(M+1\times N+1)}  \vec v = \vec b$\\ выглядит так:\\
+\end{flushleft}$$A=\begin{pmatrix}
+1+2\frac{\tau^2}{h^2}& -\frac{\tau^2}{h^2}&0&\hdotsfor{2}  &0 &0 &0\\
+\hdotsfor{7}\\
+0& 0& 0& 0& \hdotsfor{2} &-\frac{\tau^2}{h^2}& 1+2\frac{\tau^2}{h^2}\\
+\end{pmatrix}$$
+
+\begin{equation*}\vec v=
+\left(
+\begin{array}{c}
+\hat{u}_1^{n+1}\\
+\hat{u}_2^{n+1}\\
+\hdotsfor{1}\\
+\hat{u}_{M-2}^{n+1}\\
+\hat{u}_{M-1}^{n+1}\\
+\end{array}\right)
+\end{equation*}
+
+\begin{equation*}
+\vec b = \left(\begin{array}{c}
+\text{Оставшиеся при } 1\ldots n-1,1\ldots m-1 \\
+-2\omega \tau^2 u_m^n + 2 u_m^n - u_m^{n-1}\\
+\hdotsfor{1}\\
+\end{array}\right)
+\end{equation*}
+\section{Результаты расчетов лин\&нелинейной задач}
+Выберем нормы $\|u\|_{C_h}=\max_{x_i\in layer_h}|u_i|$\qquad $\|u\|_{L(1,h)}=\sum\limits_{x_i\in layer_h}|u_i|$\\
+Также абсолютные погрешности $\Delta(u)_{C_h}=\| u-v\|$\\и относительные $ \delta (u)_{C_h}=\frac{\Delta (v)}{\|u\|} $
+\begin{longtable}[l]{c|c||c|c||c|c}
+\multicolumn{6}{l}{Посчитаем нормы погрешностей}\\
+\hline
+$\tau$  &h  &$\Delta(u)_{C_h}$&$\delta (u)_{C_h}$&$\Delta(u)_{L_1^h}$&$\delta (u)_{L_1^h}$\\
+\hhline{~|~||-|-||-|-} \endfirsthead
+\hhline{~|~||=|=||=|=} 
+\multicolumn{6}{l}{Сначала по явной}\\
+\hline \endhead
+\hline
+\multicolumn{6}{l}{ещ$\acute e$ на след стр}
+\endfoot
+\hhline{=|=||=|=||=|=|} \endlastfoot
+0.01&0.01&1.03194&4.64864&1.28284&16.7129\\
+0.005&0.005&0.103005& 0.464262&0.0656159&0.861194\\
+1/80&1/80&6639.33&29903.2&3289.21&42699.8\\
+
+\end{longtable}
+\begin{longtable}[l]{c|c||c|c||c|c}
+\multicolumn{6}{l}{Посчитаем нормы погрешностей}\\
+\hline
+$\tau$  &h  &$\Delta(u)_{C_h}$&$\delta (u)_{C_h}$&$\Delta(u)_{L_1^h}$&$\delta (u)_{L_1^h}$\\
+\hhline{~|~||-|-||-|-} \endfirsthead
+\hhline{~|~||=|=||=|=} 
+\multicolumn{6}{l}{Сначала по явной}\\
+\hline \endhead
+\hline
+\multicolumn{6}{l}{ещ$\acute e$ на след стр}
+\endfoot
+\hhline{=|=||=|=||=|=|} \endlastfoot
+0.01&0.01&0.156182&15.0308&0.0925129&80.1477\\
+0.005&0.005&0.000682581&0.130575&0.000261452&0.461834\\
+0.05&0.005&0.000682581&0.130575&0.000261452&0.461834Совпало с пред\\
+0.1&0.01&0&nan&1.24166e+231&-4.09706e+142\\
+\end{longtable}
+\section{Аппроксимация}$\mathwitch$
+\begin{multline}\frac{[u_m(mh,nh)+\tau \dot u_m(mh,nh)+\tau^2/2* \ddot u_m(mh,nh)+\ldots}{\tau^2}-\ldots\\
+\frac{2*u_m(mh,nh)+u_m(mh,nh)-\tau \dot u_m(mh,nh)+\tau^2/2* \ddot u_m(mh,nh)]}{\tau^2}\ldots \\\shoveleft{+\textit{/тоже по x/}+2\omega u_m(mh,nh)=0}
+\end{multline}
+Сокращая получаем:\\[3ex]
+$$\ddot u+\ddddot u \frac{\tau^2}{12}-u''-u''''h^2/12+O(h^3+\tau^3)+2\omega u=0$$
+Для неявной(Раскрывая$ \hat u_{m+1}^{n+1} \hat u_{m-1}^{n+1}$):\\[3pt]
+$$\ddot u+\ddddot u \frac{\tau^2}{12}-( \frac{2\tau}{h^2}\dot u+u''+ \frac{\tau^2}{h^2}\ddot u+\tau \dot u'' + \frac{\tau^3}{3h^2} \dddot u+\frac{h^2}{12}u''''+\tau^2/2 \ddot u''+  \frac{\tau^4}{12h^2}\ddddot u)+2\omega u=0$$
+\clearpage
+\section[Устойчивость]{СПУ}	\begin{center} \color{green}СПУ Явной схемы\\	\end{center} 
+Представляем $u_m^n \text{ в виде  }= \lambda(\phi)^n*\exp^{i m\phi} \qquad\text{ необход признак}  \| \lambda \|\leqq 1$\\
+$$ (\lambda^2-2\lambda+1)e^{(i \phi)}h^2-\lambda \tau^2(e^{(2i \phi)}-2e^{(i \phi)}+1)+2\omega \lambda e^{(i \phi)} \tau^2 h^2\ddddot u =0\\$$
+$$\lambda^2*h^2e^{(i \phi)}-2\lambda(h^2e^{(i \phi)}-e^{(i \phi)} \tau^2+\tau^2/2+\tau^2e^{(2i \phi)}/2-\omega e^{(i \phi)} h^2\tau^2)+e^{(i \phi)}h^2 =0$$\text{Поделим еще на $h^2e^{(i \phi)}$}\\
+$$\lambda^2-\lambda(2- 2\tau^2/h^2+\frac{\tau^2}{h^2 e^{(i \phi)}}+\frac{\tau^2 e^{(i \phi)}}{h^2}-2\omega \tau^2)+1 =0$$
+Соответственно ищем  $ \lambda_1 \lambda_2\ldots$\\
+$\lambda_{1,2}=\frac{(2- 2\tau^2/h^2+\frac{\tau^2}{h^2 e^{(i \phi)}}+\frac{\tau^2e^{(i \phi)}}{h^2}-2\omega \tau^2)}{2}
+\begin{cases}
++&\frac{\sqrt{(2- 2\tau^2/h^2+\frac{\tau^2}{h^2 e^{(i \phi)}}+\frac{\tau^2 e^{(i \phi)}}{h^2}-2\omega \tau^2)^2-4}}{2}\\
+-&\frac{\sqrt{(2- 2\tau^2/h^2+\frac{\tau^2}{h^2 e^{(i \phi)}}+\frac{\tau^2 e^{(i \phi)}}{h^2}-2\omega \tau^2)^2-4}}{2}
+\end{cases}$
+$$\frac{\tau^2}{h^2 e^{(i \phi)}}+\frac{\tau^2e^{(i \phi)}}{h^2}=\frac{\tau^2(2icos{\phi})}{h^2}$$
+$$\|\lambda_{1,2}\|=\frac{\sqrt{\circled{1}^2+\circled{1}^2-4}}{2}\leq1$$
+$$\|\lambda_{1,2}\|=(1- \tau^2/h^2+\frac{\tau^2}{h^2}\cos(\phi)-\omega \tau^2)^2\leq 1$$
+Получаем условия спектральной устойчивости :\\
+\begin{enumerate}
+\item$ -\tau^2/h^2+\frac{\tau^2}{h^2}\cos(\phi)-\omega \tau^2\leq0$\\
+\item$  -\tau^2/h^2+\frac{\tau^2}{h^2}\cos(\phi)-\omega \tau^2\leq-2$\\
+\end{enumerate}
+Из 1 $\omega \geq \frac{cos(\phi)-1}{h^2} $:с учетом положительности $ \omega$ выполняется\\
+Из 2 $\omega \geq \frac{cos(\phi)-1}{h^2}+2/\tau^2\text{максимум}\quad \phi=0 \Rightarrow \omega \geq 2/\tau^2$\\
+\begin{tikzpicture}
+\begin{axis}[
+legend pos = north west,
+	colormap/greenyellow,
+	title = w(x),
+	xlabel = {$x$},
+	ylabel = {$y$},
+	minor tick num = 5
+]\legend{w(x)};
+\addplot[blue,dashed,mark = *, 
+	mark options = {
+		scale = 0.8, 
+		fill = pink, 
+		draw = prm
+	}] {1-16*x^2*(1-x)^2};
+\end{axis}
+\end{tikzpicture}\\ \begin{center}\color{green}СПУ Неявной схемы\\	\end{center} 
+$$ (\lambda^2-2\lambda+1)e^{(i \phi)}h^2-\lambda^2 \tau^2(e^{(2i \phi)}-2e^{(i \phi)}+1)+2\omega \lambda e^{(i \phi)} \tau^2 h^2 =0\\$$
+$\oplus\text{ поделим еще на }\lambda e^{(i \phi)}$\\
+$$\lambda^2(1-\frac{\tau^2}{h^2}( e^{(i \phi)}-2+\frac{1}{ e^{(i \phi)}}))-\lambda(2\omega \tau^2-2)+1=0$$
+$$\lambda^2(1-\frac{2\tau^2}{h^2}(i\sin{\phi}-1))-\lambda(2-2\omega \tau^2)+1=0$$
+$\lambda_{1,2}=\frac{(2-2\omega \tau^2)}{2(1-\frac{2\tau^2}{h^2}(i\sin{\phi}-1))}$
+$\begin{cases}
++&\frac{\sqrt{(2-2\omega \tau^2)^2-8*(1-\frac{2\tau^2}{h^2}(i\sin{\phi}-1)}}{2(1-\frac{2\tau^2}{h^2}(i\sin{\phi}-1)}\\
+-&\frac{\sqrt{(2-2\omega \tau^2)^2-8*(1-\frac{2\tau^2}{h^2}(i\sin{\phi}-1)}}{2(1-\frac{2\tau^2}{h^2}(i\sin{\phi}-1)}
+\end{cases}$
+$$\|\lambda_{1,2}\|=\frac{\sqrt{(1-\omega \tau^2)^2-4(1-\frac{2\tau^2}{h^2}(i\sin{\phi}-1)}}{\sqrt{(1+\frac{4\tau^4}{h^4}(i\sin{\phi}-1)^2}}\leq1$$
+$$\phi =0 \Rightarrow \|\lambda\| = \frac{\sqrt{(1-\omega \tau^2)^2-4(1+\frac{2\tau^2}{h^2})}}{\sqrt{(1+\frac{4\tau^4}{h^4})}}\leq1$$
+$$ \frac{\tau^4}{h^4}+2 \frac{\tau^2}{h^2}+\frac{4+2\omega \tau^2 +\omega^4 \tau^2}{4}\geq0$$
+$$ \frac{\tau^4}{h^4}(\sin(\phi)^2+\sin(\phi)-1)+2 \frac{\tau^2}{h^2}(i\sin(\phi)-1)-\frac{2\omega \tau^2+\omega^2\tau^4}{4}-1\leq0$$
+Максимум $\phi=\pi/2 \Rightarrow \tau^4(\frac{1+i}{h^4}+\omega^2)+2\tau^2(\frac{i-1}{h^2}-2\omega)-4\leq0 $
+$$\tau\in (-\tau_1,\tau_2)$$
+
+\section{Дифферинциальное приближение}Явной:
+$$\ddot u-u''+2\omega u_m^n=-\ddddot u\frac{\tau^2}{12}+u''''h^2/12+O(h^3+\tau^3)=0$$
+$$\dddot u-\dot u''+2\dot \omega u=-\ddddot u_m \frac{\tau^2}{12}+\dot u''''h^2/12+O(h^2+\tau^2)=O(h^2+\tau^2)$$
+$$\ddddot u-\ddot u''=-2\omega \ddot  u $$
+$$\ddot u=-2 \omega u+ u'' $$
+$$\ddot u-u''+2\omega u=\frac{\tau^2}{6}(\omega u''-2u''''-2\omega(u''-2\omega u))+u''''h^2/12+ O(h^3+\tau^3)$$
+Неявной:
+$$\ddot u-u''+2\omega u=-\ddddot u \frac{\tau^2}{12}+\frac{2\tau}{h^2}\dot u+ \frac{\tau^2}{h^2}\ddot u+\tau \dot u'' + \frac{\tau^3}{3h^2} \dddot u+\frac{h^2}{12}u''''+\tau^2/2 \ddot u''+  \frac{\tau^4}{12h^2}\ddddot u +O(h^3+\tau^3+ \frac{\tau^4}{12h^2})$$
+$$\dddot u-\dot u''+2\omega \dot u=\frac{2\tau}{h^2}\ddot u+\tau \ddot u'' +O(h^2+\tau^2+ \frac{\tau^3}{h^2})$$
+$$\ddot u'-u'''+2\omega u'=\frac{2\tau}{h^2}\dot u'+\tau \dot u'''+O(h^2+\tau^2+ \frac{\tau^3}{h^2})$$
+$$\ddddot u+2\omega \ddot u=\ddot u''+O(h+\tau)$$
+$$\ddot u''-u''''+2\omega u''=O(h+\tau)$$
+$\ddot u(1-\frac{\tau^2}{h^2})-(\frac{2\tau}{h^2}-2\omega)\dot u-(\tau+\frac{\tau^3}{3h^2})\dot u''-u''+2\omega u$=\\$ (\frac{\tau^2}{12}+\frac{\tau^4}{12h^2})(u''''-4\omega u''+2\omega u)+(\frac{\tau^2}{2}+\tau)(u''''-2\omega u'')+\frac{h^2}{12}u''''+\frac{2\tau}{h^2}(u''-2 \omega u)+O(h^3+\tau^3+ \frac{\tau^4}{12h^2})$
+\end{document}
+\begin{equation}
+
+\end{equation}
